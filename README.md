@@ -1,2 +1,2 @@
 # Swiss System
-Swiss system tounamet manager for table tennis competitions
+A swiss system tournamet manager for table tennis competitions
