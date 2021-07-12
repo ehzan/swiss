@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Swiss System Tournament Manager</title>
+
+    <style>
+        /* input:invalid { box-shadow: 0 0 1px 1px red; }
+
+        input:focus:invalid { box-shadow: none; } */
+
+        label.error {
+            color: crimson;
+        }
+
+        a.rempve {
+            color: crimson;
+            text-decoration: none;
+        }
+    </style>
+
+    <script>
+        var players_list = ['Shima', 'Iliya'];
+
+        function show_players() {
+            const a_tag = `<a href='javascript:void' onclick='rempve_player(event)' class='rempve' title='remove'> &#10006; </a>`;
+            olPlayers.innerHTML =
+                players_list.map(item => `<li>${item} ${a_tag}</li>`).join('\n');
+        }
+
+        function add_player(name) {
+            lblError.innerText = null;
+            if (name == null || name == '') {
+                lblError.innerText = 'Required Field';
+                txtName.focus();
+            }
+            else if (players_list.findIndex(item => item.toLowerCase() == name.toLowerCase()) != -1) {
+                lblError.innerText = 'Duplicated Name';
+                txtName.focus();
+                txtName.select();
+            }
+            else {
+                players_list.push(name);
+                show_players();
+                txtName.value = null;
+            }
+            return false;
+        }
+
+        function rempve_player(e) {
+            let name = e.target.parentElement.innerText;
+            name = name.substring(0, name.length - 2).toLowerCase();
+            i = players_list.findIndex(item => item.toLowerCase() == name);
+            players_list.splice(i, 1);
+            // delete players_list[i];
+            show_players();
+        }
+
+        function submit_form() {
+            list1.value = players_list.toString();
+            theForm.submit();
+        }
+
+        function load() {
+            show_players();
+            //txtName.setCustomValidity("I am expecting an e-mail address!");
+        }
+    </script>
+</head>
+
+<body onload="load()">
+    <form id="theForm" method="POST" autocomplete="off">
+        <p> <input type="text" name="tournament" id="txtTournament" placeholder="Tournament Name">
+            <select name="game" id="comGame">
+                <option value="Chess">Chess</option>
+                <option value="Backgammon">Backgammon</option>
+                <option value="Volleyball">Volleyball</option>
+                <option value="Table Tennis">Table Tennis</option>
+            </select>
+        </p>
+        <p> <input type="text" name="" id="txtName" placeholder="Player's Name" required autofocus>
+            <button type="submit" onclick="return add_player(txtName.value)">Add Player</button>
+            <br><label for="txtName" id="lblError" class="error"></label>
+        </p>
+        <input type="hidden" name="players_list" id="list1">
+        <input type="button" value="Next" onclick="submit_form()">
+    </form>
+    <br>
+    Players List:
+    <ol id="olPlayers">
+        <li>Shima <label>&#10006;</label></li>
+        <li>Iliya <label>&#10008;</label></li>
+    </ol>
+</body>
