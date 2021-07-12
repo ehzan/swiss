@@ -1,0 +1,315 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        td {
+            border: solid 1px;
+        }
+
+        table {
+            border: cyan;
+        }
+    </style>
+    <script>
+        function points(tr) {
+            mt1 = (tr.children[1].innerText[0]);
+            p1.innerText += mt1.toString() + ', ';
+            mt2 = parseInt(tr.children[1].innerText[4]);
+            t1 = parseInt(tr.children[2].innerText[0]);
+            t2 = parseInt(tr.children[2].innerText[4]);
+            // document.writeln(mt1); document.writeln(mt2);
+            // document.writeln(t1); document.writeln(t2);
+            if (mt1 == t1 && mt2 == t2)
+                return 5;
+            else if (Math.sign(mt1 - mt2) == Math.sign(t1 - t2))
+                return 3;
+            else return 0;
+        }
+
+        function go() {
+            let content = [];
+            str = txtarea.value;
+            str = str.replace(/-/g, '^');
+            str = str.replace(/\r?\n|\r/g, '');
+            str = str.replace(/\s+/g, ' ');
+            str = str.replace(/<tr>|<td>|<th>|<tbody>|<\/tbody>|<\/table>/g, '');
+            str = str.replace(/<\/tr>/g, '\n');
+            str = str.replace(/<\/td>|<\/th>/g, ',');
+            str = str.replace(/<.*">/g, '');
+
+            console.log(str);
+            p1.innerText = str;
+            var file1 = new File([str], "filename.csv", { type: "text/csv;charset=UTF-8" });
+            aFile.href = URL.createObjectURL(file1);
+        }
+    </script>
+</head>
+
+<body dir="rtl" onload="go()">
+    <a href="" id="aFile">link</a>
+    <textarea name="" id="txtarea">
+        <table id="TopUsers"><tbody><tr><th>بازی</th><th>پیش بینی شما</th><th>نتیجه نهایی</th></tr>
+            <tr>
+            <td dir="ltr" data-match="11176">ترکیه - ایتالیا</td>
+            <td>۰ - ۳</td>
+            <td>۰ - ۳</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11177">ولز - سوئیس</td>
+            <td>۱ - ۱</td>
+            <td>۱ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11178">دانمارک - فنلاند</td>
+            <td>۱ - ۰</td>
+            <td>۰ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11179">بلژیک - روسیه</td>
+            <td>۳ - ۰</td>
+            <td>۳ - ۰</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11180">انگلیس - کرواسی</td>
+            <td>۲ - ۱</td>
+            <td>۱ - ۰</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11181">اتریش - مقدونیه شمالی</td>
+            <td>۲ - ۰</td>
+            <td>۳ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11182">هلند - اوکراین</td>
+            <td>۲ - ۰</td>
+            <td>۳ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11183">اسکاتلند - جمهوری چک</td>
+            <td>۱ - ۰</td>
+            <td>۰ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11184">لهستان - اسلواکی</td>
+            <td>۱ - ۱</td>
+            <td>۱ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11185">اسپانیا - سوئد</td>
+            <td>۳ - ۰</td>
+            <td>۰ - ۰</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11186">مجارستان - پرتغال</td>
+            <td>۰ - ۳</td>
+            <td>۰ - ۳</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11187">فرانسه - آلمان</td>
+            <td>۱ - ۰</td>
+            <td>۱ - ۰</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11188">فنلاند - روسیه</td>
+            <td>۰ - ۱</td>
+            <td>۰ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11189">ترکیه - ولز</td>
+            <td>۱ - ۰</td>
+            <td>۰ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11190">ایتالیا - سوئیس</td>
+            <td>۲ - ۰</td>
+            <td>۳ - ۰</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11191">اوکراین - مقدونیه شمالی</td>
+            <td>۲ - ۰</td>
+            <td>۲ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11192">دانمارک - بلژیک</td>
+            <td>۰ - ۳</td>
+            <td>۱ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11193">هلند - اتریش</td>
+            <td>۲ - ۱</td>
+            <td>۲ - ۰</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11194">سوئد - اسلواکی</td>
+            <td>۲ - ۱</td>
+            <td>۱ - ۰</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11195">کرواسی - جمهوری چک</td>
+            <td>۲ - ۱</td>
+            <td>۱ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11196">انگلیس - اسکاتلند</td>
+            <td>۲ - ۰</td>
+            <td>۰ - ۰</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11197">مجارستان - فرانسه</td>
+            <td>۰ - ۳</td>
+            <td>۱ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11198">پرتغال - آلمان</td>
+            <td>۱ - ۲</td>
+            <td>۲ - ۴</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11199">اسپانیا - لهستان</td>
+            <td>۲ - ۰</td>
+            <td>۱ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11200">ایتالیا - ولز</td>
+            <td>۲ - ۰</td>
+            <td>۱ - ۰</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11201">سوئیس - ترکیه</td>
+            <td>۱ - ۰</td>
+            <td>۳ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11202">مقدونیه شمالی - هلند</td>
+            <td>۰ - ۲</td>
+            <td>۰ - ۳</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11203">اوکراین - اتریش</td>
+            <td>۱ - ۱</td>
+            <td>۰ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11204">روسیه - دانمارک</td>
+            <td>۱ - ۲</td>
+            <td>۱ - ۴</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11205">فنلاند - بلژیک</td>
+            <td>۰ - ۲</td>
+            <td>۰ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11206">جمهوری چک - انگلیس</td>
+            <td>۰ - ۱</td>
+            <td>۰ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11207">کرواسی - اسکاتلند</td>
+            <td>۱ - ۰</td>
+            <td>۳ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11208">اسلواکی - اسپانیا</td>
+            <td>۰ - ۲</td>
+            <td>۰ - ۵</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11209">سوئد - لهستان</td>
+            <td>۲ - ۱</td>
+            <td>۳ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11210">آلمان - مجارستان</td>
+            <td>۲ - ۰</td>
+            <td>۲ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11211">پرتغال - فرانسه</td>
+            <td>۱ - ۲</td>
+            <td>۲ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11812">ولز - دانمارک</td>
+            <td>۱ - ۲</td>
+            <td>۰ - ۴</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11813">ایتالیا - اتریش</td>
+            <td>۲ - ۰</td>
+            <td>۲ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11817">هلند - جمهوری چک</td>
+            <td>۲ - ۰</td>
+            <td>۰ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11818">بلژیک - پرتغال</td>
+            <td>۲ - ۱</td>
+            <td>۱ - ۰</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11819">کرواسی - اسپانیا</td>
+            <td>۰ - ۱</td>
+            <td>۳ - ۵</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11820">فرانسه - سوئیس</td>
+            <td>۲ - ۰</td>
+            <td>۳ - ۳</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11821">انگلیس - آلمان</td>
+            <td>۰ - ۱</td>
+            <td>۲ - ۰</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11822">سوئد - اوکراین</td>
+            <td>۱ - ۰</td>
+            <td>۱ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11925">سوئیس - اسپانیا</td>
+            <td>۱ - ۲</td>
+            <td>۱ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11926">بلژیک - ایتالیا</td>
+            <td>۱ - ۲</td>
+            <td>۱ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11927">جمهوری چک - دانمارک</td>
+            <td>۱ - ۲</td>
+            <td>۱ - ۲</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11929">اوکراین - انگلیس</td>
+            <td>۰ - ۲</td>
+            <td>۰ - ۴</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11981">ایتالیا - اسپانیا</td>
+            <td>۲ - ۰</td>
+            <td>۱ - ۱</td>
+            </tr>
+            <tr>
+            <td dir="ltr" data-match="11983">انگلیس - دانمارک</td>
+            <td>۲ - ۱</td>
+            <td>۲ - ۱</td>
+            </tr>
+            </tbody></table>
+    </textarea>
+    <input type="button" value="go" onclick="go()">
+    <div id=div1>
+
+    </div>
+    <p id=p1></p>
+    <table>
+
+    </table>
+</body>
+
+</html>
