@@ -3,14 +3,14 @@ from django.shortcuts import render
 # Create your views here.
 
 
-def players(request):
+def tournament(request):
     players_list = ['Radin', 'Shima', 'Ava', 'Iliya Z.', 'Iliya E.', ]
     context = {}
     # context={'tournament': 'Tavana', 'tournamentId': 14, 'game': 'Backgammon', 'number_of_rounds': 5, 'players_list': players_list}
-    return render(request, 'players.html', context)
+    return render(request, 'tournament.html', context)
 
 
-def game(request):
+def schedule(request):
     print('=========')
     requestData = request.POST if request.method == 'POST' else (
         request.Get if request.method == 'Get' else None)
@@ -20,4 +20,4 @@ def game(request):
             context[item] = requestData[item]
     context['players_list'] = context['players_list'].replace(',', ', ')
     print(context)
-    return render(request, 'round.html', context)
+    return render(request, 'schedule.html', context)
