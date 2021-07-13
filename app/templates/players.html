@@ -1,29 +1,38 @@
 {% extends "template.html" %}
 {% load static %}
 
-{% block title %} Swiss System {% endblock %}
 {% block scripts %}
-<script src={% static 'players.js' %}></script>
+<script src="{% static 'players.js' %}"> </script>
+<script>
+    var tournament = "{{ tournament|escape }}";
+    var tournamentId = "{{ tournamentId|escape }}";
+    var game = "{{ game|escape }}";
+    var number_of_rounds = "{{ number_of_rounds|escape }}"
+    var players_list = "{{ players_list|escape }}";
+</script>
 {% endblock %}
 
 {% block content %}
-<form id="theForm" method="POST" autocomplete="off">
+<form id="theForm" method="POST">
     {% csrf_token %}
-    <p> <input type="text" name="tournament" id="txtTournament" placeholder="Tournament Name" autofocus>
-        <select name="game" id="comGame">
-            <option value="Chess">Chess</option>
-            <option value="Backgammon">Backgammon</option>
-            <option value="Volleyball">Volleyball</option>
-            <option value="Table Tennis">Table Tennis</option>
-        </select>
-    </p>
-    <p> <input type="text" name="" id="txtName" placeholder="Player's Name" required>
-        <button type="submit" onclick="return add_player(txtName.value)">Add Player</button>
-        <br><label for="txtName" id="lblError" class="error"></label>
-    </p>
-    <input type="hidden" name="players_list" id="list1">
-</form>
-<br>
-Players List:
+    <label>Tournament Name: <input type="text" name="tournament" placeholder="Enter tournament name" autofocus
+            drequired></label>
+    <input type="hidden" name="tournamentId">
+    <select name="game">
+        <option value="Chess">Chess</option>
+        <option value="Backgammon">Backgammon</option>
+        <option value="Volleyball">Volleyball</option>
+        <option value="Table Tennis">Table Tennis</option>
+    </select></label> <br><br>
+    <label>Player's Name: <input type="text" name="" id="txtName" class='mytest'
+            placeholder="Enter player's name"></label>
+    <button type="submit" onclick="return add_player(txtName.value)" style="width: 7em;"> Add Player </button>
+    <br><label for="txtName" id="lblError" class="error" style="padding-left: 8em;"></label>
+    <br>
+    <label>Number of Rounds: <input type="number" min=1 max=10 size=5 name="number_of_rounds" required></label>
+    <input type="hidden" name="players_list">
+
+</form><br>
+<div style="font-size: larger;"> Participants: </div>
 <ol id="olPlayers"></ol>
 {% endblock %}

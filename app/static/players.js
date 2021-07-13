@@ -1,4 +1,4 @@
-var players_list = ['Radin', 'Shima', 'Ava', 'Iliya Z.', 'Iliya E.',];
+var players_list;
 
 function show_players() {
     const a_tag = `<a href='javascript:void' onclick='remove_player(event)' class='remove' title='remove'> &#10006; </a>`;
@@ -9,18 +9,18 @@ function show_players() {
 function add_player(name) {
     lblError.innerText = null;
     if (name == null || name == '') {
-        lblError.innerText = 'Required Field';
+        lblError.innerText = '*Required Field';
         txtName.focus();
     }
-    else if (players_list.findIndex(item => item.toLowerCase() == name.toLowerCase()) != -1) {
-        lblError.innerText = 'Duplicated Name';
+    else if (players_list.length && players_list.findIndex(item => item.toLowerCase() == name.toLowerCase()) != -1) {
+        lblError.innerText = '*Duplicated Name';
         txtName.focus();
         txtName.select();
     }
     else {
         players_list.push(name);
-        show_players();
         txtName.value = null;
+        show_players();
     }
     return false;
 }
@@ -35,15 +35,31 @@ function remove_player(e) {
 }
 
 function next() {
-    list1.value = players_list.toString();
-    theForm.submit();
+    theForm['players_list'].value = players_list.toString();
+    theForm.action = '../game/'
+    theForm.requestSubmit();
+    // if (theForm.checkValidity())
 }
 
 function back() {
 }
 
 function load() {
+    console.log(tournament);
+    console.log(tournamentId);
+    console.log(game);
+    console.log(number_of_rounds);
+    if (players_list.length == 0)
+        players_list = '[]';
+    players_list = players_list.replace(/\'|&#x27;/g, '\"');
+    players_list = JSON.parse(players_list);
+    console.log(players_list);
+    theForm['tournament'].value = tournament;
+    theForm['tournamentId'].value = tournamentId;
+    if (game)
+        theForm['game'].value = game;
+    theForm['number_of_rounds'].value = number_of_rounds;
     show_players();
-    btnNext.disabled = false;
+    btnBack.disabled = true;
     //txtName.setCustomValidity("I am expecting an e-mail address!");
 }

@@ -1,10 +1,10 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 
 <head>
     <meta name=viewport content="width=device-width, initial-scale=1">
     <title> {% block title %} Swiss System Tournament Manager {% endblock %} </title>
-    <link rel=icon href="{% static 'logo.ico' %}">
+    <link rel=icon href="{% static 'favicon.ico' %}">
     <link rel=stylesheet href="{% static 'style.css' %}" type=text/css>
     {% block style %} {% endblock %}
     {% block scripts %} {% endblock %}
@@ -13,7 +13,7 @@
 <body onload="load()">
     {% block content %} {% endblock %}
     <footer>
-        <input type="button" id="btnBack" value="Back" onclick="back()" disabled>
-        <input type="button" id="btnNext" value="Next" onclick="next()" disabled>
+        <button id="btnBack" value="Back" onclick="back()"> Back </button>
+        <button id="btnNext" value="Next" onclick="next()"> Next </button>
     </footer>
 </body>
