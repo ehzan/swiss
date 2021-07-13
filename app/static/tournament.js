@@ -36,7 +36,7 @@ function remove_player(e) {
 
 function next() {
     theForm['players_list'].value = players_list.toString();
-    theForm.action = '../game/'
+    theForm.action = '../schedule/'
     theForm.requestSubmit();
     // if (theForm.checkValidity())
 }
@@ -45,20 +45,23 @@ function back() {
 }
 
 function load() {
-    console.log(tournament);
-    console.log(tournamentId);
-    console.log(game);
-    console.log(number_of_rounds);
+    // console.log(tournamentName);
+    // console.log(tournamentId);
+    // console.log(game);
+    // console.log(number_of_rounds);
     if (players_list.length == 0)
         players_list = '[]';
     players_list = players_list.replace(/\'|&#x27;/g, '\"');
     players_list = JSON.parse(players_list);
     console.log(players_list);
-    theForm['tournament'].value = tournament;
-    theForm['tournamentId'].value = tournamentId;
+    if (tournamentName)
+        theForm['tournamentName'].value = tournamentName;
+    if (tournamentId)
+        theForm['tournamentId'].value = tournamentId;
     if (game)
         theForm['game'].value = game;
-    theForm['number_of_rounds'].value = number_of_rounds;
+    if (number_of_rounds)
+        theForm['number_of_rounds'].value = number_of_rounds;
     show_players();
     btnBack.disabled = true;
     //txtName.setCustomValidity("I am expecting an e-mail address!");

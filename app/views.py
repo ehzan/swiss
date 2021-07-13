@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from . import models
+from django.http import HttpResponse
 
 # Create your views here.
 
@@ -12,12 +14,23 @@ def tournament(request):
 
 def schedule(request):
     print('=========')
-    requestData = request.POST if request.method == 'POST' else (
+    data = request.POST if request.method == 'POST' else (
         request.Get if request.method == 'Get' else None)
-    context = {}
-    if requestData:
-        for item in requestData:
-            context[item] = requestData[item]
-    context['players_list'] = context['players_list'].replace(',', ', ')
-    print(context)
-    return render(request, 'schedule.html', context)
+    # for item in data:
+    #     print(item, data[item])
+    try:
+        mySport = models.Sport.objects.get(name=data['game'])
+    except:
+        return HttpResponse('Somthing went wrong!')
+
+    tourId = int(data['tournamentId']) if data['tournamentId'] else None
+    myTour, created = models.Tournament.objects.get_or_create(
+        id=tourId, sport=mySport)
+    myTour.name = data['tournamentName']
+    if (data['number_of_rounds']):
+        myTour.number_of_rounds = int(data['number_of_rounds'])
+    myTour.save()
+    print(myTour.__dict__)
+    # context['players_list'] = context['players_list'].replace(',', ', ')
+    # print(context)
+    return render(request, 'schedule.html', myTour.__dict__)

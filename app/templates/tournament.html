@@ -4,7 +4,7 @@
 {% block scripts %}
 <script src="{% static 'tournament.js' %}"> </script>
 <script>
-    var tournament = "{{ tournament|escape }}";
+    var tournamentName = "{{ tournament|escape }}";
     var tournamentId = "{{ tournamentId|escape }}";
     var game = "{{ game|escape }}";
     var number_of_rounds = "{{ number_of_rounds|escape }}"
@@ -15,7 +15,7 @@
 {% block content %}
 <form id="theForm" method="POST">
     {% csrf_token %}
-    <label>Tournament Name: <input type="text" name="tournament" placeholder="Enter tournament name" autofocus
+    <label>Tournament Name: <input type="text" name="tournamentName" placeholder="Enter tournament name" autofocus
             drequired></label>
     <input type="hidden" name="tournamentId">
     <select name="game" style="text-align: center;">
