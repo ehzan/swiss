@@ -4,9 +4,9 @@
 {% block scripts %}
 <script src="{% static 'tournament.js' %}"> </script>
 <script>
-    var tournamentName = "{{ tournament|escape }}";
     var tournamentId = "{{ tournamentId|escape }}";
-    var game = "{{ game|escape }}";
+    var tournamentName = "{{ tournamentName|escape }}";
+    var sport = "{{ sport|escape }}";
     var number_of_rounds = "{{ number_of_rounds|escape }}"
     var players_list = "{{ players_list|escape }}";
 </script>
@@ -18,7 +18,7 @@
     <label>Tournament Name: <input type="text" name="tournamentName" placeholder="Enter tournament name" autofocus
             drequired></label>
     <input type="hidden" name="tournamentId">
-    <select name="game" style="text-align: center;">
+    <select name="sport" style="text-align: center;">
         <option value="Chess">Chess</option>
         <option value="Backgammon">Backgammon</option>
         <option value="Volleyball">Volleyball</option>

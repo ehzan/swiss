@@ -1,5 +1,3 @@
-var players_list;
-
 function show_players() {
     const a_tag = `<a href='javascript:void' onclick='remove_player(event)' class='remove' title='remove'> &#10006; </a>`;
     olPlayers.innerHTML =
@@ -47,19 +45,19 @@ function back() {
 function load() {
     // console.log(tournamentName);
     // console.log(tournamentId);
-    // console.log(game);
+    // console.log(sport);
     // console.log(number_of_rounds);
-    if (players_list.length == 0)
-        players_list = '[]';
-    players_list = players_list.replace(/\'|&#x27;/g, '\"');
-    players_list = JSON.parse(players_list);
+    if (players_list)
+        players_list = players_list.split(', ');
+    else
+        players_list = [];
     console.log(players_list);
     if (tournamentName)
         theForm['tournamentName'].value = tournamentName;
     if (tournamentId)
         theForm['tournamentId'].value = tournamentId;
-    if (game)
-        theForm['game'].value = game;
+    if (sport)
+        theForm['sport'].value = sport;
     if (number_of_rounds)
         theForm['number_of_rounds'].value = number_of_rounds;
     show_players();

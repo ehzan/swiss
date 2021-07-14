@@ -2,14 +2,43 @@
 
 {% block scripts %}
 <script>
+    var csrf_token = '{% csrf_token %}';
+    var tournamentId = "{{ tournamentId|escape }}";
+    var tournamentName = "{{ tournamentName|escape }}";
+    var sport = "{{ sport|escape }}";
+    var number_of_rounds = "{{ number_of_rounds|escape }}"
+    var players_list = "{{ players_list|escape }}";
+</script>
+
+<script>
+    function back() {
+        theForm = document.createElement('Form');
+        document.body.appendChild(theForm);
+        theForm.method = 'POST';
+        theForm.action = '../tournament/';
+        theForm.innerHTML += csrf_token;
+        for (let item of ['tournamentId', 'tournamentName', 'sport', 'number_of_rounds', 'players_list']) {
+            let input = document.createElement('input');
+            input.type = 'text';
+            input.name = item;
+            input.value = eval(item);
+            theForm.appendChild(input);
+        }
+        theForm.requestSubmit();
+    }
+
     function load() {
+
     }
 </script>
 {% endblock %}
 
 {% block content %}
 <p>
-    <b> {{ name }} </b> {{ sport }} tournament. ({{ number_of_rounds }} rounds) <br>
+    {% csrf_token %} ,
+    <br>
+    {{ tournamentId|escape }}
+    <b> {{ TournamentName }} </b> {{ sport }} tournament. ({{ number_of_rounds }} rounds) <br>
     <b> Players: </b> <i> {{ players_list }} </i><br>
 </p>
 {% endblock %}

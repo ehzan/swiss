@@ -12,7 +12,7 @@ class Sport(models.Model):
 
 class Tournament(models.Model):
     name = models.CharField(max_length=100, null=False)
-    sport = models.ForeignKey(Sport(), on_delete=models.CASCADE)
+    sport = models.ForeignKey(Sport(), on_delete=models.CASCADE, null=True)
     number_of_rounds = models.IntegerField(null=True)
 
     def __str__(self):
