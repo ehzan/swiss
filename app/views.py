@@ -1,12 +1,19 @@
 from django.shortcuts import render
 from . import models
 from django.http import HttpResponse
-from django.views.decorators import csrf
+# from django.views.decorators import csrf
 
 # Create your views here.
 
 
-# @csrf.csrf_exempt
+def match(tour):
+    players = models.Player.objects.filter(tournament=tour)
+    if len(players) == 0:
+        return None
+    else:
+        return None
+
+
 def tournament(request):
     print('==========tournament==========')
     players_list = ['Radin', 'Shima', 'Ava', 'Iliya Z.', 'Iliya E.', ]

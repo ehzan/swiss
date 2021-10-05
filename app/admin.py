@@ -5,3 +5,4 @@ from . import models
 admin.site.register(models.Sport)
 admin.site.register(models.Tournament)
 admin.site.register(models.Player)
+admin.site.register(models.Match)
