@@ -20,16 +20,14 @@ class Tournament(models.Model):
 
 
 class Player(models.Model):
-    name = models.CharField(max_length=20, null=False)
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
-    points = models.IntegerField(default=0)
+    firstname = models.CharField(max_length=20)
+    lastname = models.CharField(max_length=30)
 
     class Meta:
-        unique_together = ['name', 'tournament']
-        ordering = ['name']
+        unique_together = ['firstname', 'lastname']
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.tournament)
+        return self.firstname+' '+self.lastname
 
 
 class Match(models.Model):

@@ -16,14 +16,19 @@ def match(tour):
 
 def tournament(request):
     print('==========tournament==========')
-    players_list = ['Radin', 'Shima', 'Ava', 'Iliya Z.', 'Iliya E.', ]
+
+    players_list = models.Player.objects.all().order_by('firstname', 'lastname')
     context = {}
     data = request.POST if request.method == 'POST' else (
         request.Get if request.method == 'Get' else {})
     for item in data:
         context[item] = data[item]
     print(context)
-    # context={'tournament': 'Tavana', 'tournamentId': 14, 'game': 'Backgammon', 'number_of_rounds': 5, 'players_list': players_list}
+    context = {'tournament': 'Tavana', 'tournamentId': 14,
+               'game': 'Backgammon', 'number_of_rounds': 5,
+               'sports_list': ['Table Tennis', 'Chess', 'Backgammon', 'Volleyball'],
+               'players_list': players_list
+               }
     return render(request, 'tournament.html', context)
 
 

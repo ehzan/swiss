@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html>
 {% load static %}
 
 <head>
@@ -10,10 +11,12 @@
     {% block scripts %} {% endblock %}
 </head>
 
-<body onload="load()">
+<body>
     {% block content %} {% endblock %}
     <footer>
-        <button id="btnBack" value="Back" onclick="back()"> Back </button>
-        <button id="btnNext" value="Next" onclick="next()"> Next </button>
+        <button id="btnBack" value="Back"> Back </button>
+        <button id="btnNext" value="Next"> Next </button>
     </footer>
 </body>
+
+</html>
