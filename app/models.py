@@ -11,12 +11,12 @@ class Sport(models.Model):
 
 
 class Tournament(models.Model):
-    name = models.CharField(max_length=100, null=False)
+    name = models.CharField(max_length=100, null=False, unique=True)
     sport = models.ForeignKey(Sport(), on_delete=models.CASCADE, null=True)
     number_of_rounds = models.IntegerField(null=True)
 
     def __str__(self):
-        return '{} [id={}]'.format(self.name, self.id)
+        return self.name
 
 
 class Player(models.Model):
@@ -28,6 +28,19 @@ class Player(models.Model):
 
     def __str__(self):
         return self.firstname+' '+self.lastname
+
+
+class Participant(models.Model):
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    initial_rating = models.IntegerField(null=True)
+
+    class Meta:
+        unique_together = ['tournament', 'player']
+        ordering = ['tournament', 'player']
+
+    def __str__(self):
+        return '{} ({})'.format(self.player, self.tournament)
 
 
 class Match(models.Model):

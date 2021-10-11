@@ -1,0 +1,103 @@
+{% extends "template.html" %}
+
+{% block scripts %}
+<style>
+    .styled-table {
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 0.9em;
+        font-family: sans-serif;
+        min-width: 400px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .styled-table thead tr {
+        background-color: #009879;
+        color: #ffffff;
+        text-align: left;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 12px 15px;
+    }
+
+    .styled-table tbody tr {
+        border-bottom: 1px solid #dddddd;
+    }
+
+    .styled-table tbody tr:nth-of-type(even) {
+        background-color: #f3f3f3;
+    }
+
+    .styled-table tbody tr:last-of-type {
+        border-bottom: 2px solid #009879;
+    }
+
+    .styled-table tbody tr.active-row {
+        font-weight: bold;
+        color: #009879;
+    }
+</style>
+<script>
+    var csrf_token = "{% csrf_token %}";
+    var tournamentId = "{{ tournamentId|escape }}";
+    var tournamentName = "{{ tournamentName|escape }}";
+    var sport = "{{ sport|escape }}";
+    var number_of_rounds = "{{ number_of_rounds|escape }}"
+    var players_list = "{{ players_list|escape }}";
+</script>
+
+<script>
+    function back() {
+        theForm = document.createElement('Form');
+        document.body.appendChild(theForm);
+        theForm.method = 'POST';
+        theForm.action = '../tournament/';
+        theForm.innerHTML += csrf_token;
+        for (let item of ['tournamentId', 'tournamentName', 'sport', 'number_of_rounds', 'players_list']) {
+            let input = document.createElement('input');
+            input.type = 'text';
+            input.name = item;
+            input.value = eval(item);
+            theForm.appendChild(input);
+        }
+        theForm.requestSubmit();
+    }
+
+</script>
+{% endblock %}
+
+{% block content %}
+<p> {% csrf_token %} </p>
+<p> <b> {{ tournamentName }} </b> {{ sport }} Tournament. ({{ number_of_rounds }} rounds) </p>
+<table class="styled-table">
+    <thead>
+        <tr>
+            <td align=center colspan="4"> Round #0 </td>
+        </tr>
+        <tr>
+            <td>Rank</td>
+            <td>Name</td>
+            <td>Points</td>
+            <td>Rating</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for participant in participants %}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{ participant.player}}</td>
+            <td align="center">0</td>
+            <td>{{participant.initial_rating}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<!-- Participants:
+<ol style="margin:5px;">
+    {% for participant in participants %}
+    <li id="{{ participant.id }}"> {{ participant.player}} (rating: {{participant.initial_rating}})</li>
+    {% endfor %}
+</ol> -->
+{% endblock %}

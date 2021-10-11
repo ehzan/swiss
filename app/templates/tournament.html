@@ -10,20 +10,43 @@
     var number_of_rounds = "{{ number_of_rounds|escape }}"
     var players_list = "{{ players_list|escape }}";
 
+    var participants;
+
     function remove_participant(e) {
         for (let player of selPlayers.options) {
-            if (player.value == e.target.parentElement.id)
+            if (player.value == e.target.parentElement.parentElement.id)
                 player.style.display = "block";
         }
-        e.target.parentElement.remove();
+        e.target.parentElement.parentElement.remove();
+    }
+
+    function check_int(e) {
+        if (e.target.value == "" || parseInt(e.target.value) == e.target.value)
+            e.target.setAttribute('malue', e.target.value);
+        else
+            e.target.value = e.target.getAttribute('malue');
     }
 
     function add_participant() {
-        const a_tag = `<a href="javascript:void 0" onclick="remove_participant(event)" class="remove" title="remove"> &#10006; </a>`;
+        const a_tag = `<a href="javascript:void 0" tabindex=-1 onclick="remove_participant(event)" class="remove" title="remove"> &#10006; </a>`;
+        const input_tag = `<input type="text" placeholder="Rating" size=5 oninput="check_int(event)" required value="900">`;///TODO: remove default value
         for (item of [...selPlayers.options].filter(x => x.selected)) {
+            item.selected = false;
             item.style.display = "none";
-            olParticipants.innerHTML += `<li id=${item.value}> ${item.innerText} ${a_tag} </li>`;
+            let li_element = document.createElement("li");
+            li_element.id = item.value;
+            li_element.innerHTML = `<span style="display:inline-block; width:150px; vertical-align:top;">${item.innerText} ${a_tag}</span> ${input_tag}`;
+            olParticipants.appendChild(li_element);
         }
+    }
+
+    function next() {
+        ///TODO: check if tournament name exists
+        participants_ratings = [...olParticipants.children].map(li => li.id + ':' + li.getElementsByTagName("input")[0].value);
+        theForm.participants_ratings.value = participants_ratings;
+        theForm.action = "../preview/";
+        console.log(theForm);
+        theForm.requestSubmit();
     }
 </script>
 {% endblock %}
@@ -32,19 +55,18 @@
 <form id="theForm" method="POST">
     {% csrf_token %}
     <label>Tournament Name:
-        <input type="text" name="tournamentName" placeholder="Enter tournament name">
+        <input type="text" name="tournamentName" placeholder="Enter tournament name" required>
     </label>
-    <input type="hidden" name="tournamentId">
     <select name="sport" style="text-align: center;">
         {% for sport in sports_list %}
         <option value="{{sport}}">{{sport}}</option>
         {% endfor %}
     </select> <br><br>
     <label>Number of Rounds:
-        <input type="number" min=1 max=15 size=5 name="number_of_rounds">
+        <input type="number" min=1 max=15 size=5 name="number_of_rounds" required>
     </label> <br><br>
     <div style="display:table;">
-        <select name="" id="selPlayers" multiple=true size=10>
+        <select id="selPlayers" multiple=true size=10>
             {% for player in players_list %}
             <option value="{{player.id}}">{{player.firstname}} {{player.lastname}}</option>
             {% endfor %}
@@ -57,7 +79,7 @@
             <ol id="olParticipants" style="margin:5px;"> </ol>
         </div>
     </div>
-    <br><br>
+    <input type="hidden" name="participants_ratings">
     <label for="txtName" id="lblError" class="error" style="padding-left: 8em;"></label>
 </form>
 {% endblock %}

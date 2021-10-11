@@ -32,38 +32,41 @@ def tournament(request):
     return render(request, 'tournament.html', context)
 
 
-def schedule(request):
-    print('==========schedule==========')
+def preview(request):
+    print('==========preview==========')
     data = request.POST if request.method == 'POST' else (
         request.Get if request.method == 'Get' else None)
-    for item in data:
-        print(item, data[item])
+    print(data)
     try:
         theSport = models.Sport.objects.get(name=data['sport'])
     except:
         return HttpResponse('Somthing went wrong!')
-    tourId = int(data['tournamentId']) if data['tournamentId'] else None
     theTour, created = models.Tournament.objects.get_or_create(
-        id=tourId)
-    theTour.name = data['tournamentName']
+        name=data['tournamentName'])
     theTour.sport = theSport
-    if (data['number_of_rounds']):
-        theTour.number_of_rounds = int(data['number_of_rounds'])
+    theTour.number_of_rounds = int(data['number_of_rounds'])
     theTour.save()
-    players_list = data['players_list'].split(
-        ',') if data['players_list'] else []
-    models.Player.objects.filter(tournament=theTour).delete()
-    for player in players_list:
-        models.Player.objects.create(name=player, tournament=theTour)
-    context = theTour.__dict__
-    thePlayers = models.Player.objects.filter(
-        tournament=theTour).values_list('name', flat=True)
-    context['players_list'] = ', '.join(list(thePlayers))
-    context['sport'] = theTour.sport.name
-    context['tournamentId'] = theTour.id
-    context['tournamentName'] = theTour.name
-    print(context)
 
-    # context['players_list'] = context['players_list'].replace(',', ', ')
-    # print(context)
-    return render(request, 'schedule.html', context)
+    participants_ratings = data['participants_ratings'].split(
+        ',') if data['participants_ratings'] else []
+    participants = []
+    rating = {}
+    for pr in participants_ratings:
+        id = pr.split(':')[0]
+        r = pr.split(':')[1]
+        participants.append(int(id))
+        rating[int(id)] = int(r)
+
+    models.Participant.objects.filter(
+        tournament=theTour).exclude(player__id__in=participants).delete()
+    for id in participants:
+        participant, created = models.Participant.objects.get_or_create(
+            player=models.Player.objects.get(id=id), tournament=theTour)
+        participant.initial_rating = rating[id]
+        participant.save()
+
+    context = {'sport': theTour.sport.name, 'tournamentName': theTour.name,
+               'number_of_rounds': theTour.number_of_rounds,
+               'participants': models.Participant.objects.filter(tournament=theTour).order_by('-initial_rating')}
+    print(context)
+    return render(request, 'preview.html', context)
