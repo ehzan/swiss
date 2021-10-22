@@ -133,8 +133,10 @@ def tiebreak(Sa, Sb, Pa, Pb):
     return tiebreak
 
 
-def rating_change(Sa, Sb, Ra, Rb):
-    K = 32
+def rating_change(Sa, Sb, Ra, Rb, K=150):
+    if (Rb == 0 and Sa > Sb) or (Ra == 0 and Sa < Sb):
+        return 0
+    # K = 150
     S = 1 if Sa > Sb else (0 if Sa < Sb else 0.5)
     Ea = (10**(Ra/400))/(10**(Ra/400)+10**(Rb/400))
     return K*(S-Ea)
