@@ -1,0 +1,106 @@
+{% extends "template.html" %}
+{% load static %}
+
+{% block style&scripts %}
+<script src="{% static 'tournament.js' %}"> </script>
+<script>
+    var tournamentId = "{{ tournamentId|escape }}";
+    var tournamentName = "{{ tournamentName|escape }}";
+    var sport = "{{ sport|escape }}";
+    var number_of_rounds = "{{ number_of_rounds|escape }}"
+    var players_list = "{{ players_list|escape }}";
+
+    var participants = "{% for participant in participants %}{{ participant.player.id }}, {% endfor %}".split(', ');
+
+    function remove_participant(e) {
+        for (let player of selPlayers.options) {
+            if (player.value == e.target.parentElement.parentElement.id)
+                player.style.display = "block";
+        }
+        e.target.parentElement.parentElement.remove();
+    }
+
+    function check_int(e) {
+        if (e.target.value == "" || parseInt(e.target.value) == e.target.value)
+            e.target.setAttribute('malue', e.target.value);
+        else
+            e.target.value = e.target.getAttribute('malue');
+    }
+
+    function add_participant() {
+        const a_tag = `<a href="javascript:void 0" tabindex=-1 onclick="remove_participant(event)" class="remove" title="remove"> &#10006; </a>`;
+        const input_tag = `<input type="text" placeholder="Rating" size=5 oninput="check_int(event)" required>`;
+        for (item of [...selPlayers.options].filter(x => x.selected)) {
+            item.selected = false;
+            item.style.display = "none";
+            let li_element = document.createElement("li");
+            li_element.id = item.value;
+            li_element.innerHTML = `<span style="display:inline-block; width:150px; vertical-align:top;">${item.innerText} ${a_tag}</span> ${input_tag}`;
+            olParticipants.appendChild(li_element);
+        }
+    }
+
+    function next() {
+        ///TODO: check if tournament name exists
+        participants_ratings = [...olParticipants.children].map(li => li.id + ':' + li.getElementsByTagName("input")[0].value);
+        theForm.participants_ratings.value = participants_ratings;
+        // alert(window.location.origin);
+        theForm.action = "{% url 'preview1' %}";
+        console.log(theForm);
+        theForm.requestSubmit();
+    }
+    function load() {
+        btnPrevious.disabled = true;
+        console.log(participants);
+        for (elem of [...selPlayers.children].filter(selOption => participants.includes(selOption.value))) {
+            elem.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<form id="theForm" method="POST">
+    {% csrf_token %}
+    <label>Tournament Name:
+        <input type="text" name="tournamentName" placeholder="Enter tournament name" required
+            value="{{tournament.name}}">
+    </label>
+    <select name="sport" style="text-align: center;">
+        {% for sport in sports_list %}
+        <option value="{{sport}}" "{% if sport == tournament.sport %} selected {% endif %}"> {{sport}} </option>
+        {% endfor %}
+    </select> <br><br>
+    <label>Number of Rounds:
+        <input type="number" min=1 max=15 size=5 name="number_of_rounds" required
+            value="{{tournament.number_of_rounds}}">
+    </label> <br><br>
+    <div style="display:table;">
+        <select id="selPlayers" multiple=true size=10>
+            {% for player in players_list %}
+            <option value="{{player.id}}">{{player.firstname}} {{player.lastname}}</option>
+            {% endfor %}
+        </select>
+        <div style="display:table-cell; vertical-align:top; padding:100px 20px">
+            <input type="button" value="Add" onclick="add_participant()">
+        </div>
+        <div style="display:table-cell; vertical-align:top;">
+            Participants:
+            <ol id="olParticipants" style="margin:5px;">
+                {% for participant in participants %}
+                <li id="{{participant.player.id}}">
+                    <span style="display:inline-block; width:150px; vertical-align:top;"> {{participant.player}}
+                        <a href="javascript:void 0" tabindex=-1 onclick="remove_participant(event)" class="remove"
+                            title="remove"> &#10006; </a>
+                    </span>
+                    <input type="text" placeholder="Rating" size=5 oninput="check_int(event)" required
+                        value="{{participant.initial_rating}}">
+                </li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+    <input type="hidden" name="participants_ratings">
+    <label for="txtName" id="lblError" class="error" style="padding-left: 8em;"></label>
+</form>
+{% endblock %}

@@ -1,18 +1,61 @@
 {% extends "template.html" %}
 {% load static %}
 
-{% block scripts %}
+{% block style&scripts %}
 <script src="{% static 'tournament.js' %}"> </script>
 <script>
-    var tournamentId = "{{ tournamentId|escape }}";
-    var tournamentName = "{{ tournamentName|escape }}";
-    var sport = "{{ sport|escape }}";
-    var number_of_rounds = "{{ number_of_rounds|escape }}"
-    var players_list = "{{ players_list|escape }}";
+    function save() {
+        ///TODO: check if tournament name exists
+        theForm.participants_ratings.value = JSON.stringify(get_ratings());
+        theForm.action = "{% url 'save_tournament' tournament.id|default:0 %}";
+        console.log(theForm);
+        theForm.requestSubmit();
+    }
 
-    var participants;
+    function get_ratings() {
+        let parti_ratings = {}
+        for (li of olParticipants.children)
+            parti_ratings[li.id] = li.getElementsByTagName("input")[0].value;
+        console.log(parti_ratings);
+        // parti_ratings = { ...olParticipants.children }.map(li => li.id + ':' + li.getElementsByTagName("input")[0].value)
+        return parti_ratings;
+    };
+
+    var everything_is_saved = true;
+    var participants = "{% for participant in participants %}{{ participant.player.id }}, {% endfor %}".split(', ');
+    var url_next = "{% url 'round' tournament.id|default:0 1 %}";
+
+    function load() {
+        btnPrevious.disabled = true;
+        for (let option of selPlayers.children)
+            option.style.display = participants.includes(option.value) ? "none" : "block";
+        for (input of document.getElementsByTagName("input"))
+            input.onchange = (e) => everything_is_saved = false;
+        for (select of document.getElementsByTagName("select")) {
+            input.onchange = (e) => everything_is_saved = false;
+        }
+    }
+
+    function reload(forced = false) {
+        if (everything_is_saved || forced)
+            window.location.reload();
+        else {
+            btnConfirmYes.onclick = (e) => reload(true);
+            pWarning.hidden = false;
+        }
+    }
+
+    function next(forced = false) {
+        if (everything_is_saved || forced)
+            window.location.replace(url_next);
+        else {
+            btnConfirmYes.onclick = (e) => next(true);
+            pWarning.hidden = false;
+        }
+    }
 
     function remove_participant(e) {
+        everything_is_saved = false;
         for (let player of selPlayers.options) {
             if (player.value == e.target.parentElement.parentElement.id)
                 player.style.display = "block";
@@ -20,16 +63,10 @@
         e.target.parentElement.parentElement.remove();
     }
 
-    function check_int(e) {
-        if (e.target.value == "" || parseInt(e.target.value) == e.target.value)
-            e.target.setAttribute('malue', e.target.value);
-        else
-            e.target.value = e.target.getAttribute('malue');
-    }
-
     function add_participant() {
+        everything_is_saved = false;
         const a_tag = `<a href="javascript:void 0" tabindex=-1 onclick="remove_participant(event)" class="remove" title="remove"> &#10006; </a>`;
-        const input_tag = `<input type="text" placeholder="Rating" size=5 oninput="check_int(event)" required value="900">`;///TODO: remove default value
+        const input_tag = `<input type="text" placeholder="Rating" size=5 oninput="check_int(event)" required>`;
         for (item of [...selPlayers.options].filter(x => x.selected)) {
             item.selected = false;
             item.style.display = "none";
@@ -40,46 +77,65 @@
         }
     }
 
-    function next() {
-        ///TODO: check if tournament name exists
-        participants_ratings = [...olParticipants.children].map(li => li.id + ':' + li.getElementsByTagName("input")[0].value);
-        theForm.participants_ratings.value = participants_ratings;
-        theForm.action = "../preview/";
-        console.log(theForm);
-        theForm.requestSubmit();
+    function check_int(e) {
+        everything_is_saved = false;
+        if (e.target.value == "" || parseInt(e.target.value) == e.target.value)
+            e.target.setAttribute('malue', e.target.value);
+        else
+            e.target.value = e.target.getAttribute('malue');
     }
+
 </script>
 {% endblock %}
 
 {% block content %}
 <form id="theForm" method="POST">
     {% csrf_token %}
-    <label>Tournament Name:
-        <input type="text" name="tournamentName" placeholder="Enter tournament name" required>
-    </label>
-    <select name="sport" style="text-align: center;">
-        {% for sport in sports_list %}
-        <option value="{{sport}}">{{sport}}</option>
-        {% endfor %}
-    </select> <br><br>
-    <label>Number of Rounds:
-        <input type="number" min=1 max=15 size=5 name="number_of_rounds" required>
-    </label> <br><br>
-    <div style="display:table;">
-        <select id="selPlayers" multiple=true size=10>
-            {% for player in players_list %}
-            <option value="{{player.id}}">{{player.firstname}} {{player.lastname}}</option>
+    <input type="hidden" name="participants_ratings">
+    <p>
+        <label>Tournament Name:
+            <input type="text" name="tournamentName" placeholder="Enter tournament name" required
+                value="{{ tournament.name }}">
+        </label>
+        <select name="sport" style="text-align: center;">
+            {% for sport in sports_list %}
+            <option value="{{ sport }}" "{% if sport == tournament.sport %} selected {% endif %}"> {{sport}} </option>
             {% endfor %}
         </select>
-        <div style="display:table-cell; vertical-align:top; padding:100px 20px">
-            <input type="button" value="Add" onclick="add_participant()">
+    </p>
+    <p>
+        <label>Number of Rounds:
+            <input type="number" min=1 max=15 size=5 name="number_of_rounds" required
+                value="{{ tournament.number_of_rounds }}">
+        </label>
+    </p>
+    <div style="display: flex; flex-wrap: wrap;">
+        <div>
+            <select id="selPlayers" multiple=true size=10>
+                {% for player in players_list %}
+                <option value="{{ player.id }}">{{ player.firstname }} {{ player.lastname }}</option>
+                {% endfor %}
+            </select>
         </div>
-        <div style="display:table-cell; vertical-align:top;">
+        <div style="padding:20px 20px; display: flex; align-items: center;">
+            <input type="button" value="Add Player" onclick="add_participant()">
+        </div>
+        <div>
             Participants:
-            <ol id="olParticipants" style="margin:5px;"> </ol>
+            <ol id="olParticipants" style="margin:5px;">
+                {% for participant in participants %}
+                <li id="{{ participant.player.id }}">
+                    <span style="display:inline-block; width:150px; vertical-align:top;"> {{ participant.player }}
+                        <a href="#" tabindex=-1 onclick="remove_participant(event)" class="remove" title="remove">
+                            &#10006; </a>
+                    </span>
+                    <input type="text" placeholder="Rating" size=5 oninput="check_int(event)" required
+                        value="{{ participant.initial_rating }}">
+                </li>
+                {% endfor %}
+            </ol>
         </div>
     </div>
-    <input type="hidden" name="participants_ratings">
-    <label for="txtName" id="lblError" class="error" style="padding-left: 8em;"></label>
+    <label id="lblError" class="error" style="padding-left: 8em;"></label>
 </form>
 {% endblock %}

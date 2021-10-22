@@ -1,0 +1,238 @@
+{% extends "template.html" %}
+{% load humanize %}
+
+
+{% block style&scripts %}
+<style>
+    .styled-table {
+        border-collapse: collapse;
+        margin: 10px;
+        /* min-width: 400px; */
+        box-shadow: 0 0 20px lightgray;
+    }
+
+    .styled-table thead tr {
+        background-color: darkcyan;
+        color: white;
+        text-align: left;
+    }
+
+    .styled-table tbody tr {
+        border-bottom: 1px solid #dddddd;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 12px 15px;
+    }
+
+    .styled-table tbody tr:nth-of-type(even) {
+        background-color: whitesmoke;
+    }
+</style>
+
+<script>
+    var everything_is_saved = true;
+
+    function load() {
+        if (parseInt("{{ round }}") <= 1)
+            btnPrevious.disabled = true;
+        if (parseInt("{{ round }}") >= parseInt("{{ tournament.number_of_rounds }}"))
+            btnNext.disabled = true;
+    }
+
+    function reload(forced = false) {
+        if (everything_is_saved || forced)
+            window.location.reload();
+        else {
+            btnConfirmYes.onclick = (e) => reload(true);
+            pWarning.hidden = false;
+        }
+    }
+
+    function previous(forced = false) {
+        if (everything_is_saved || forced)
+            if (parseInt("{{ round }}") > 1)
+                window.location.replace("{% url 'round' tournament.id round|add:-1 %}");
+            else;
+        else {
+            btnConfirmYes.onclick = (e) => previous(true);
+            pWarning.hidden = false;
+        }
+    }
+
+    function next(forced = false) {
+        if (everything_is_saved || forced)
+            if (parseInt("{{ round }}") < parseInt("{{ tournament.number_of_rounds }}"))
+                window.location.replace("{% url 'round' tournament.id round|add:1 %}");
+            else;
+        else {
+            btnConfirmYes.onclick = (e) => next(true);
+            pWarning.hidden = false;
+        }
+    }
+
+    function remove_match(e) {
+        everything_is_saved = false;
+        tr = e.target.parentElement.parentElement;
+        tr.parentElement.removeChild(tr);
+        id1 = tr.children[0].id;
+        id2 = tr.children[3].id;
+        console.log(id1 + " " + id2);
+        document.getElementById(id1).getElementsByTagName('input')[0].disabled = false;
+        document.getElementById(id2).getElementsByTagName('input')[0].disabled = false;
+    }
+
+    function check_number(input) {
+        everything_is_saved = false;
+        let re = /^[0-9]?$/;
+        if (re.test(input.value))
+            input.setAttribute('malue', input.value);
+        else
+            input.value = input.getAttribute('malue');
+    }
+
+    function* selected_row() {
+        for (let chk of tbTable.getElementsByTagName('input'))
+            if (!chk.disabled && chk.checked)
+                yield chk.parentElement.parentElement;
+    }
+
+    function add_match() {
+        everything_is_saved = false;
+        let row = selected_row();
+        let row1 = row.next().value;
+        let row2 = row.next().value;
+        if (row2) {
+            row1.getElementsByTagName('input')[0].disabled = true;
+            row2.getElementsByTagName('input')[0].disabled = true;
+            tr = tbMatches.getElementsByTagName('tbody')[0].insertRow(-1);
+            tr.innerHTML = `<td nowrap id=${row1.id}>${row1.children[1].innerText}</td>`;
+            tr.innerHTML += `<td><input type=text size=1 oninput="check_number(this)"></td>`;
+            tr.innerHTML += `<td><input type=text size=1 oninput="check_number(this)"></td>`;
+            tr.innerHTML += `<td nowrap id=${row2.id}>${row2.children[1].innerText}</td>`;
+            tr.innerHTML += `<td><a href="#" tabindex=-1 onclick="remove_match(event)" class="remove" title="remove">
+                        &#10006; </a></td>`;
+        }
+    }
+
+    function get_results() {
+        let result = {}, results = [];
+        for (let tr of tbMatches.getElementsByTagName("tbody")[0].children) {
+            result = {
+                "playerId1": parseInt(tr.children[0].id),
+                "playerId2": parseInt(tr.children[3].id),
+                "score1": parseInt(tr.getElementsByTagName("input")[0].value),
+                "score2": parseInt(tr.getElementsByTagName("input")[1].value)
+            }
+            results.push(result);
+        }
+        return results;
+    }
+
+    function ajax_response_handler() {
+        if (this.responseText != "Saved!") {
+            console.log(this.responseText);
+            alert("Somthing went wrong! Data was not saved.");
+            return;
+        }
+        everything_is_saved = true;
+        pWarning.hidden = true;
+        lbSave.style.transition = "";
+        lbSave.style.opacity = "100%";
+        setTimeout(function () {
+            lbSave.style.transition = "opacity 2s";
+            lbSave.style.opacity = "0%";
+        }, 2000);
+    }
+
+    function save() {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = ajax_response_handler;
+        let url = "{% url 'save_round' tournament.id round %}"
+        theForm.results.value = JSON.stringify(get_results());
+        console.log(theForm);
+        if (theForm.checkValidity()) {
+            xhr.open(theForm.method, url, true);
+            xhr.send(new FormData(theForm));
+        }
+        else
+            theForm.reportValidity();
+    }
+
+</script>
+{% endblock %}
+
+{% block content %}
+<p> {% csrf_token %} </p>
+<h1> {{ tournament.name }} {{ tournament.sport }} Tournament ({{ tournament.number_of_rounds }} rounds) </h1>
+<div style="display: flex; flex-wrap: wrap;">
+    <div>
+        <table id="tbTable" class="styled-table">
+            <thead>
+                <tr>
+                    <td align=center colspan="8"> After {{ round|add:-1|ordinal }} Round </td>
+                </tr>
+                <tr>
+                    <td>Rank</td>
+                    <td>Name</td>
+                    <td>MP</td>
+                    <td>W-L</td>
+                    <td>Pts</td>
+                    <td>TB</td>
+                    <td>Rating</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for id , participant in table.items %}
+                <tr id={{id}}>
+                    <td> {{ forloop.counter }} </td>
+                    <td nowrap> {{ participant.playerName }} </td>
+                    <td> {{ participant.played }} </td>
+                    <td> {{ participant.won }}-{{ participant.lost }} </td>
+                    <td> {{ participant.points|floatformat }} </td>
+                    <td> {{ participant.tiebreak|floatformat }} </td>
+                    <td> {{ participant.rating|floatformat:0 }} </td>
+                    <td> <input type="checkbox" {% if participant.selected %} disabled checked {% endif %}>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div style="padding:20px 20px; display: flex; align-items: center;">
+        <input type="button" value="Add Match" onclick="add_match()">
+    </div>
+    <div>
+        <form id="theForm" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="results">
+            <table id="tbMatches" class="styled-table">
+                <thead>
+                    <tr>
+                        <td align=center colspan="5"> Round #{{ round }} Matches </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td nowrap id="{{ result.player1.id }}">{{result.player1}}</td>
+                        <td><input type=text size=1 oninput="check_number(this)"
+                                value="{{ result.score1|floatformat }}">
+                        </td>
+                        <td><input type=text size=1 oninput="check_number(this)"
+                                value="{{ result.score2|floatformat }}">
+                        </td>
+                        <td nowrap id="{{ result.player2.id }}"> {{result.player2}} </td>
+                        <td><a href="#" tabindex=-1 onclick="remove_match(event)" class="remove" title="remove">
+                                &#10006; </a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <label id=lbSave style="margin: 20px; opacity: 0%; color: #006666;">Data Saved!</label>
+        </form>
+    </div>
+</div>
+{% endblock %}

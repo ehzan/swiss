@@ -7,16 +7,24 @@
     <title> {% block title %} Swiss System Tournament Manager {% endblock %} </title>
     <link rel=icon href="{% static 'favicon.ico' %}">
     <link rel=stylesheet href="{% static 'style.css' %}" type=text/css>
-    {% block style %} {% endblock %}
-    {% block scripts %} {% endblock %}
+    {% block style&scripts %} {% endblock %}
 </head>
 
-<body>
+<body onload="load()">
     {% block content %} {% endblock %}
     <br>
     <footer>
-        <button id="btnPrevious" value="Previous" onclick="Previous()"> Previous </button>
-        <button id="btnNext" value="Next" onclick="next()"> Next </button>
+        <hr>
+        <button id="btnPrevious" onclick="previous()"> Previous </button>
+        <button id="btnReload" onclick="reload()"> Reload </button>
+        <button id="btnSave" onclick="save()"> Save </button>
+        <button id="btnNext" onclick="next()"> Next </button>
+        <p id="pWarning" style="font-weight: bold; color: firebrick;" hidden>
+            Warning: You have unsaved changes. Are you sure you want to discard them and
+            continue?
+            <button id="btnConfirmYes">Yes</button>
+            <button id="btnConfirmNo" onclick="pWarning.hidden=true;">No</button>
+        </p>
     </footer>
 </body>
 

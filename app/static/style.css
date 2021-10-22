@@ -1,6 +1,17 @@
+body {
+    font-family: Calibri, Arial, sans-serif;
+    font-size: large;
+}
+
 * {
     font-family: Calibri, Arial, sans-serif;
-    font-size: 18px;
+    font-size: large;
+}
+
+h1 {
+    font-family: Cambria, Calibri, Arial, sans-serif;
+    font-size: x-large;
+    font-style: italic;
 }
 
 input:invalid { box-shadow: 0 0 1px 1px red; }

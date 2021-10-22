@@ -36,8 +36,8 @@ class Participant(models.Model):
     initial_rating = models.IntegerField(null=True)
 
     class Meta:
-        unique_together = ['tournament', 'player']
-        ordering = ['tournament', 'player']
+        unique_together = ['tournament', 'player', ]
+        ordering = ['tournament', 'player', ]
 
     def __str__(self):
         return '{} ({})'.format(self.player, self.tournament)
@@ -50,13 +50,14 @@ class Match(models.Model):
         Player, on_delete=models.CASCADE, related_name='player1')
     player2 = models.ForeignKey(
         Player, on_delete=models.CASCADE, related_name='player2')
-    points1 = models.FloatField(null=True)
-    points2 = models.FloatField(null=True)
+    score1 = models.FloatField(null=True)
+    score2 = models.FloatField(null=True)
+
+    class Meta:
+        unique_together = ['tournament', 'round', 'player1', 'player2', ]
+        ordering = ['tournament', 'round', ]
 
     def __str__(self):
-        return '{} {}-{} {}'.format(self.player1.name[:10],
-                                    int(self.points1) if int(
-                                        self.points1) == self.points1 else self.points1,
-                                    int(self.points2) if int(
-                                        self.points2) == self.points2 else self.points2,
-                                    self.player2.name[:10], )
+        return '{} {}-{} {}'.format(self.player1.firstname,
+                                    self.score1, self.score2,
+                                    self.player2.firstname,)
