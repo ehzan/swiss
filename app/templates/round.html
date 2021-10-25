@@ -164,45 +164,47 @@
 {% endblock %}
 
 {% block content %}
-<p> {% csrf_token %} </p>
 <h1> {{ tournament.name }} {{ tournament.sport }} Tournament ({{ tournament.number_of_rounds }} rounds) </h1>
 <div style="display: flex; flex-wrap: wrap;">
     <div>
-        <table id="tbTable" class="styled-table">
-            <thead>
-                <tr>
-                    <td align=center colspan="8"> After {{ round|add:-1|ordinal }} Round </td>
-                </tr>
-                <tr>
-                    <td>Rank</td>
-                    <td>Name</td>
-                    <td>MP</td>
-                    <td>W-L</td>
-                    <td>Pts</td>
-                    <td>TB</td>
-                    <td>Rating</td>
-                    <td></td>
-                </tr>
-            </thead>
-            <tbody>
-                {% for id , participant in table.items %}
-                <tr id={{id}}>
-                    <td> {{ forloop.counter }} </td>
-                    <td nowrap> {{ participant.playerName }} </td>
-                    <td> {{ participant.played }} </td>
-                    <td> {{ participant.won }}-{{ participant.lost }} </td>
-                    <td> {{ participant.points|floatformat }} </td>
-                    <td> {{ participant.tiebreak|floatformat }} </td>
-                    <td> {{ participant.rating|floatformat:0 }} </td>
-                    <td> <input type="checkbox" {% if participant.selected %} disabled checked {% endif %}>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <form id="form1" onsubmit="return false;">
+            <table id="tbTable" class="styled-table">
+                <thead>
+                    <tr>
+                        <td align=center colspan="8"> After {{ round|add:-1|ordinal }} Round </td>
+                    </tr>
+                    <tr>
+                        <td>Rank</td>
+                        <td>Name</td>
+                        <td>MP</td>
+                        <td>W-L</td>
+                        <td>Pts</td>
+                        <td>TB</td>
+                        <td>Rating</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for id , participant in table.items %}
+                    <tr id={{id}}>
+                        <td> {{ forloop.counter }} </td>
+                        <td nowrap> {{ participant.playerName }} </td>
+                        <td> {{ participant.played }} </td>
+                        <td> {{ participant.won }}-{{ participant.lost }} </td>
+                        <td> {{ participant.points|floatformat }} </td>
+                        <td> {{ participant.tiebreak|floatformat }} </td>
+                        <td> {{ participant.rating|floatformat:0 }} </td>
+                        <td>
+                            <input type="checkbox" tabindex=-1 {% if participant.selected %} disabled checked {%endif%}>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
     </div>
-    <div style="padding:20px 20px; display: flex; align-items: center;">
-        <input type="button" value="Add Match" onclick="add_match()">
+    <div style="padding:10% 20px; display: flex; align-items: baseline;">
+        <input type="submit" form="form1" value="Add Match" onclick="add_match()">
     </div>
     <div>
         <form id="theForm" method="POST">
@@ -231,7 +233,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <label id=lbSave style="margin: 20px; opacity: 0%; color: #006666;">Data Saved!</label>
         </form>
     </div>
 </div>

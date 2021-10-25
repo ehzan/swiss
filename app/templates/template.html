@@ -15,16 +15,17 @@
     <br>
     <footer>
         <hr>
-        <button id="btnPrevious" onclick="previous()"> Previous </button>
-        <button id="btnReload" onclick="reload()"> Reload </button>
-        <button id="btnSave" onclick="save()"> Save </button>
-        <button id="btnNext" onclick="next()"> Next </button>
         <p id="pWarning" style="font-weight: bold; color: firebrick;" hidden>
             Warning: You have unsaved changes. Are you sure you want to discard them and
             continue?
             <button id="btnConfirmYes">Yes</button>
             <button id="btnConfirmNo" onclick="pWarning.hidden=true;">No</button>
         </p>
+        <button id="btnPrevious" onclick="previous()"> Previous </button>
+        <button id="btnReload" onclick="reload()"> Reload </button>
+        <button id="btnSave" onclick="save()"> Save </button>
+        <button id="btnNext" onclick="next()"> Next </button>
+        <label id=lbSave style="margin: 20px; opacity: 0%; font-weight: bold; color:crimson;">Data Saved!</label>
     </footer>
 </body>
 

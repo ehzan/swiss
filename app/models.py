@@ -15,6 +15,9 @@ class Tournament(models.Model):
     sport = models.ForeignKey(Sport(), on_delete=models.CASCADE, null=True)
     number_of_rounds = models.IntegerField(null=True)
 
+    class Meta:
+        ordering = ['sport', 'name', ]
+
     def __str__(self):
         return self.name
 
@@ -58,6 +61,5 @@ class Match(models.Model):
         ordering = ['tournament', 'round', ]
 
     def __str__(self):
-        return '{} {}-{} {}'.format(self.player1.firstname,
-                                    self.score1, self.score2,
-                                    self.player2.firstname,)
+        return '{}: {} {}-{} {}'.format(self.tournament, self.player1.firstname,
+                                        self.score1, self.score2, self.player2.firstname,)

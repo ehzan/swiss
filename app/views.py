@@ -178,10 +178,12 @@ def table(tournamentId, round):
             id1 = m.player1.id
             id2 = m.player2.id
             if m.score1 != None and m.score2 != None:
-                table[id1]['tiebreak'] = tiebreak(
+                table[id1]['tiebreak'] += tiebreak(
                     m.score1, m.score2, table[id1]['points'], table[id2]['points'])
-                table[id2]['tiebreak'] = tiebreak(
+                table[id2]['tiebreak'] += tiebreak(
                     m.score2, m.score1, table[id2]['points'], table[id1]['points'])
+    table = dict(sorted(table.items(),
+                        key=lambda row: row[1]['playerName']))
     table = dict(sorted(table.items(),
                         key=lambda row: row[1]['points']*10000+row[1]['tiebreak'], reverse=True))
     return(table)
@@ -201,3 +203,15 @@ def round(request, tournamentId, round):
     context = {'tournament': theTour, 'round': round,
                'results': results, 'table': mytable, }
     return render(request, 'round.html', context)
+
+
+def init_ratings(tournamentId, predecessorId):
+    preTable = table(predecessorId, models.Tournament.objects.get(
+        id=predecessorId).number_of_rounds+1)
+    print(list(preTable))
+    for participant in models.Participant.objects.filter(tournament__id=tournamentId):
+        participant.initial_rating = (preTable[participant.player.id]['rating'] + 100)\
+            if participant.player.id in preTable else 1000
+        participant.save()
+    print(models.Participant.objects.filter(tournament__id=tournamentId))
+    return

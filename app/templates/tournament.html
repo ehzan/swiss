@@ -111,13 +111,14 @@
     </p>
     <div style="display: flex; flex-wrap: wrap;">
         <div>
-            <select id="selPlayers" multiple=true size=10>
+            Players: <br>
+            <select id="selPlayers" multiple=true size=15 style="margin: 10px;">
                 {% for player in players_list %}
                 <option value="{{ player.id }}">{{ player.firstname }} {{ player.lastname }}</option>
                 {% endfor %}
             </select>
         </div>
-        <div style="padding:20px 20px; display: flex; align-items: center;">
+        <div style="padding:10% 20px; display: flex; align-items: baseline;">
             <input type="button" value="Add Player" onclick="add_participant()">
         </div>
         <div>
