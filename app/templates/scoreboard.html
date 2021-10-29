@@ -33,7 +33,7 @@
 
 <script>
 
-    const interval = 30 * 1000;
+    const interval = 15 * 1000;
     var step = 0;
 
     function load() {
@@ -44,19 +44,19 @@
     }
 
     function change_display() {
-        switch (++step % 3) {
+        switch (++step % 2) {
             case 0:
-                scrollTo(0, 0);
+                // scrollTo(0, 0);
                 div1.style.display = "block";
                 div2.style.display = "none";
                 break;
+            // case 1:
+            //     scrollTo(0, document.body.scrollHeight);
+            //     div1.style.display = "block";
+            //     div2.style.display = "none";
+            //     break;
             case 1:
-                scrollTo(0, document.body.scrollHeight);
-                div1.style.display = "block";
-                div2.style.display = "none";
-                break;
-            case 2:
-                scrollTo(0, 0);
+                // scrollTo(0, 0);
                 div1.style.display = "none";
                 div2.style.display = "block";
                 break;

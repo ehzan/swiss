@@ -266,9 +266,9 @@ def init_ratings(*tournamentIds):
 
 
 def ratings(request, tournamentIds=None):
-    players_list = init_ratings(101, 102, 103)
+    players_list = init_ratings(101, 102, 103, 104)
     for player in players_list.items():
-        player[1]['winPct'] = player[1]['won']/player[1]['played']*100
+        player[1]['winPct'] = player[1]['won']/player[1]['played']*100 if player[1]['played'] else 0
     print(players_list)
     # players_list = models.Player.objects.all().order_by('firstname', 'lastname')
     context = {'players_list': players_list}
