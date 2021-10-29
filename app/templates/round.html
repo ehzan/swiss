@@ -149,7 +149,7 @@
     function save() {
         const xhr = new XMLHttpRequest();
         xhr.onload = ajax_response_handler;
-        let url = "{% url 'save_round' tournament.id round %}"
+        let url = "{% url 'save_round' tournament.id round %}";
         theForm.results.value = JSON.stringify(get_results());
         console.log(theForm);
         if (theForm.checkValidity()) {
@@ -177,7 +177,7 @@
                         <td>Rank</td>
                         <td>Name</td>
                         <td>MP</td>
-                        <td>W-L</td>
+                        <td nowrap>W-L</td>
                         <td>Pts</td>
                         <td>TB</td>
                         <td>Rating</td>
@@ -190,7 +190,7 @@
                         <td> {{ forloop.counter }} </td>
                         <td nowrap> {{ participant.playerName }} </td>
                         <td> {{ participant.played }} </td>
-                        <td> {{ participant.won }}-{{ participant.lost }} </td>
+                        <td nowrap> {{ participant.won }}-{{ participant.lost }} </td>
                         <td> {{ participant.points|floatformat }} </td>
                         <td> {{ participant.tiebreak|floatformat }} </td>
                         <td> {{ participant.rating|floatformat:0 }} </td>

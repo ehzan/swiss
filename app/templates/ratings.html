@@ -1,0 +1,88 @@
+{% extends "template.html" %}
+{% load static %}
+
+{% block style&scripts %}
+<style>
+    .styled-table {
+        border-collapse: collapse;
+        margin: 10px;
+        /* min-width: 400px; */
+        box-shadow: 0 0 20px lightgray;
+    }
+
+    .styled-table thead tr {
+        background-color: darkcyan;
+        color: white;
+        text-align: left;
+    }
+
+    .styled-table tbody tr {
+        border-bottom: 1px solid #dddddd;
+        text-align: center;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 10px;
+    }
+
+    .styled-table tbody tr:nth-of-type(even) {
+        background-color: whitesmoke;
+    }
+</style>
+
+<script>
+
+    const interval = 5 * 1000;
+    var step = 0;
+
+    function load() {
+        document.getElementsByTagName("footer")[0].hidden = true;
+        // setInterval(change_display, interval);
+    }
+
+    function change_display() {
+        switch (++step % 2) {
+            case 0:
+                scrollTo(0, 0);
+                break;
+            case 1:
+                scrollTo(0, document.body.scrollHeight);
+                break;
+        }
+    }
+</script>
+
+{% endblock %}
+
+{% block content %}
+<h1> {{ tournament.name }} {{ tournament.sport }} Tournament </h1>
+<div style="display: flex; flex-wrap: wrap;">
+    <div>
+        <table id="tbRatings" class="styled-table">
+            <thead>
+                <tr>
+                    <td>Rank</td>
+                    <td>Name</td>
+                    <td>Played</td>
+                    <td>Win%</td>
+                    <td nowrap>Won-Lost</td>
+                    <td nowrap>Rating</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for id, player in players_list.items %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td nowrap align="left">{{ player.name }}</td>
+                    <td nowrap>{{ player.played }}</td>
+                    <td nowrap>{{ player.winPct|floatformat:0 }}%</td>
+                    <td nowrap>{{ player.won }}-{{ player.lost }}</td>
+                    <td nowrap>{{ player.rating|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

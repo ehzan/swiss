@@ -1,16 +1,207 @@
-<html>
+{% extends "template.html" %}
 {% load static %}
 
-<head>
-    <meta name=viewport content="width=device-width, initial-scale=1">
-    <title> {% block title %} Swiss System Tournament Manager {% endblock %} </title>
-    <link rel=icon href="{% static 'favicon.ico' %}">
-    <link rel=stylesheet href="{% static 'style.css' %}" type=text/css>
-</head>
+{% block style&scripts %}
+<style>
+    .styled-table {
+        border-collapse: collapse;
+        margin: 10px;
+        /* min-width: 400px; */
+        box-shadow: 0 0 20px lightgray;
+    }
 
-<body>
-    hi<br>
-    <iframe src="http://192.168.1.36:8000" frameborder="0"></iframe>
-</body>
+    .styled-table thead tr {
+        background-color: darkcyan;
+        color: white;
+        text-align: left;
+    }
 
-</html>
+    .styled-table tbody tr {
+        border-bottom: 1px solid #dddddd;
+        text-align: center;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 10px;
+    }
+
+    .styled-table tbody tr:nth-of-type(even) {
+        background-color: whitesmoke;
+    }
+</style>
+
+<script>
+
+    const interval = 5 * 1000;
+    var step = 0;
+
+    function load() {
+        document.getElementsByTagName("footer")[0].hidden = true;
+        reload_table2();
+        setInterval(reload_table2, interval * 6);
+        setInterval(change_display, interval);
+    }
+
+    function change_display() {
+        switch (++step % 3) {
+            case 0:
+                scrollTo(0, 0);
+                div1.style.display = "block";
+                div2.style.display = "none";
+                break;
+            case 1:
+                scrollTo(0, document.body.scrollHeight);
+                div1.style.display = "block";
+                div2.style.display = "none";
+                break;
+            case 2:
+                scrollTo(0, 0);
+                div1.style.display = "none";
+                div2.style.display = "block";
+                break;
+        }
+        console.log(step);
+    }
+
+    function reload_if_sit_is_up() {
+        var img = document.createElement('img');
+        img.src = "{% static 'favicon.ico' %}";
+        img.onload = function () {
+            console.log('up');
+            // setTimeout(window.location.reload(), 5000);
+            window.location.reload();
+        }
+        img.onerror = function () {
+            console.log('down');
+            setTimeout(reload_if_sit_is_up, 2000);
+        }
+    }
+
+    function ajax_response_handler() {
+        console.log(this.responseText);
+        // document.body.innerHTML = this.responseText;
+    }
+
+    function reload_table() {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = ajax_response_handler;
+        xhr.open("POST", url, true);
+        form1.shit.value = "{{ csrf_token }}";
+        form1.csrfmiddlewaretoken.value = "{{ csrf_token }}";
+        // xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
+        xhr.send(new FormData(form1));
+    }
+
+    var url = "{% url 'get_scoreboard' tournament.id %}";
+
+    function reload_table2() {
+        // console.log("{{ csrf_token }}");
+        // console.log(form1.csrfmiddlewaretoken.value);
+        // console.log(getCookie("csrftoken"));
+
+        let fetchRes = fetch(url, {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: "{}",
+        });
+        fetchResThen1 = fetchRes.then(resp => resp.json());
+        fetchResThen2 = fetchResThen1.then(data => fulfill(data));
+    }
+
+    function fulfill(data) {
+        arr = Object.values(data['table']).sort((a, b) =>
+            10000 * (b["points"] - a["points"]) + b["tiebreak"] - a["tiebreak"]);
+
+        tbTable.getElementsByTagName('tbody')[0].innerHTML = "";
+        let rank = 0;
+        for (let row of arr) {
+            tr = tbTable.getElementsByTagName('tbody')[0].insertRow(-1);
+            tr.innerHTML = `<td>${++rank}</td>`;
+            tr.innerHTML += `<td nowrap align=left>${row["playerName"]}</td>`;
+            tr.innerHTML += `<td>${row["played"]}</td>`;
+            tr.innerHTML += `<td>${row["points"]}</td>`;
+            tr.innerHTML += `<td nowarap>${row["won"]}-${row["lost"]}</td>`;
+            tr.innerHTML += `<td>${row["tiebreak"]}</td>`;
+            tr.innerHTML += `<td>${parseInt(row["rating"])}</td>`;
+        }
+
+        tbMatches.getElementsByTagName('tbody')[0].innerHTML = "";
+        for (let match of Object.values(data['matches'])) {
+            tr = tbMatches.getElementsByTagName('tbody')[0].insertRow(-1);
+            tr.innerHTML += `<td align=left nowrap>${match["player1"]}</td>`;
+            tr.innerHTML += `<td nowrap>${match["score1"] == null ? "" : match["score1"]}
+                - ${match["score2"] == null ? "" : match["score2"]}</td>`;
+            tr.innerHTML += `<td align=right nowrap>${match["player2"]}</td>`;
+
+            tbMatches.getElementsByTagName('thead')[0].getElementsByTagName('td')[0].innerText = `Round #${match['round']} Matches`;
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+<form id="form1" method="POST" onsubmit="return false;">
+    {% csrf_token %}
+</form>
+
+<h1> {{ tournament.name }} {{ tournament.sport }} Tournament ({{ tournament.number_of_rounds }} rounds) </h1>
+<div style="display: flex; flex-wrap: wrap;">
+    <div id="div1">
+        <table id="tbTable" class="styled-table">
+            <thead>
+                <tr>
+                    <td>Rank</td>
+                    <td>Name</td>
+                    <td>Played</td>
+                    <td>Points</td>
+                    <td nowrap>Won-Lost</td>
+                    <td>Tiebreak</td>
+                    <td nowrap>Live Rating</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan=7> Loading data...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="div2">
+        <table id="tbMatches" class="styled-table">
+            <thead>
+                <tr>
+                    <td align=center colspan="3">Round #n Matches</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan=3> Loading data...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

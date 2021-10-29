@@ -1,15 +1,51 @@
 from django.shortcuts import render
 from . import models
-from django.db.models import Value, IntegerField, FloatField, CharField, F, Func, ExpressionWrapper
-from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models import Value, IntegerField, FloatField, CharField, F, Func, ExpressionWrapper, Max
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 import json
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
 
-def scoreboard(request):
-    return render(request, 'scoreboard.html')
+def scoreboard(request, tournamentId):
+    print(tournamentId)
+    theTour = models.Tournament.objects.get(id=tournamentId)
+    context = {'tournament': theTour}
+    return render(request, 'scoreboard.html', context=context)
+
+
+# @csrf_exempt
+def save_aunt(request, tournamentId=None):
+    print('==========save_aunt==========')
+    data = json.load(request)
+    print(data)
+    return HttpResponse('aunt!')
+
+
+def get_scoreboard(request, tournamentId=None):
+    print('======load-scoreboard=========')
+    # return JsonResponse({'data': 'amghazi'})
+    print(request.POST)
+    print(json.load(request))
+    table1 = table(tournamentId, models.Tournament.objects.get(
+        id=tournamentId).number_of_rounds+1)
+    print(table1)
+    print(current_matches(tournamentId))
+    # return JsonResponse(table1)
+    return JsonResponse({'table': table1, 'matches': current_matches(tournamentId)})
+
+
+def current_matches(tournamentId):
+    round = models.Match.objects.filter(
+        tournament__id=tournamentId).aggregate(max=Max('round'))['max']
+    matches = models.Match.objects.filter(
+        tournament__id=tournamentId, round=round)
+    matches_list = [{'round': m.round, 'player1': m.player1.__str__(),
+                     'player2': m.player2.__str__(), 'score1': m.score1, 'score2': m.score2}
+                    for m in matches]
+    return matches_list
 
 
 def tournament(request, tournamentId=None):
@@ -40,7 +76,7 @@ def save_tournament(request, tournamentId=None):
         theTour = models.Tournament.objects.get(id=tournamentId)
     else:
         try:
-            theTour = models.Tournament.objects.create(
+            theTour, created = models.Tournament.objects.get_or_create(
                 name=data['tournamentName'])
         except:
             return HttpResponse('"{}" is unavailable.'.format(data['tournamentName']))
@@ -133,7 +169,7 @@ def tiebreak(Sa, Sb, Pa, Pb):
     return tiebreak
 
 
-def rating_change(Sa, Sb, Ra, Rb, K=150):
+def rating_change(Sa, Sb, Ra, Rb, K=100):
     if (Rb == 0 and Sa > Sb) or (Ra == 0 and Sa < Sb):
         return 0
     # K = 150
@@ -205,13 +241,35 @@ def round(request, tournamentId, round):
     return render(request, 'round.html', context)
 
 
-def init_ratings(tournamentId, predecessorId):
-    preTable = table(predecessorId, models.Tournament.objects.get(
-        id=predecessorId).number_of_rounds+1)
-    print(list(preTable))
-    for participant in models.Participant.objects.filter(tournament__id=tournamentId):
-        participant.initial_rating = (preTable[participant.player.id]['rating'] + 100)\
-            if participant.player.id in preTable else 1000
-        participant.save()
-    print(models.Participant.objects.filter(tournament__id=tournamentId))
-    return
+def init_ratings(*tournamentIds):
+    print('==========init_ratings==========')
+    all_players = models.Participant.objects.filter(
+        tournament__id__in=tournamentIds)
+    players_list = dict(
+        map(lambda p: (p.player.id, {'name': p.player.__str__(), 'played': 0, 'won': 0, 'lost': 0, 'rating': 900}), all_players))
+    players_list[0]['rating'] = 0
+    for id in tournamentIds:
+        for p in models.Participant.objects.filter(tournament__id=id):
+            p.initial_rating = players_list[p.player.id]['rating'] + 100 \
+                if p.player.firstname != 'Bye' else 0
+            p.save()
+        t1 = table(id, models.Tournament.objects.get(id=id).number_of_rounds+1)
+        for row in t1.items():
+            players_list[row[0]]['rating'] = row[1]['rating']
+            players_list[row[0]]['played'] += row[1]['played']
+            players_list[row[0]]['won'] += row[1]['won']
+            players_list[row[0]]['lost'] += row[1]['lost']
+
+    players_list = dict(sorted(players_list.items(),
+                        key=lambda row: row[1]['rating'], reverse=True))
+    return players_list
+
+
+def ratings(request, tournamentIds=None):
+    players_list = init_ratings(101, 102, 103)
+    for player in players_list.items():
+        player[1]['winPct'] = player[1]['won']/player[1]['played']*100
+    print(players_list)
+    # players_list = models.Player.objects.all().order_by('firstname', 'lastname')
+    context = {'players_list': players_list}
+    return render(request, 'ratings.html', context=context)
