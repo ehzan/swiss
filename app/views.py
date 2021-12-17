@@ -266,7 +266,7 @@ def init_ratings(*tournamentIds):
 
 
 def ratings(request, tournamentIds=None):
-    players_list = init_ratings(101, 102, 103, 104, 105, 106)
+    players_list = init_ratings(101, 102, 103, 104, 105, 106, 107)
     for player in players_list.items():
         player[1]['winPct'] = player[1]['won']/player[1]['played']*100 if player[1]['played'] else 0
     print(players_list)
