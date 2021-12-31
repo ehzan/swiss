@@ -169,7 +169,7 @@ def tiebreak(Sa, Sb, Pa, Pb):
     return tiebreak
 
 
-def rating_change(Sa, Sb, Ra, Rb, K=100):
+def rating_change(Sa, Sb, Ra, Rb, K=60):
     if (Rb == 0 and Sa > Sb) or (Ra == 0 and Sa < Sb):
         return 0
     # K = 150
@@ -221,7 +221,7 @@ def table(tournamentId, round):
     table = dict(sorted(table.items(),
                         key=lambda row: row[1]['playerName']))
     table = dict(sorted(table.items(),
-                        key=lambda row: row[1]['points']*10000+row[1]['tiebreak'], reverse=True))
+                        key=lambda row: row[1]['points']*1000+row[1]['tiebreak']+row[1]['rating']/10000, reverse=True))
     return(table)
 
 
@@ -266,9 +266,10 @@ def init_ratings(*tournamentIds):
 
 
 def ratings(request, tournamentIds=None):
-    players_list = init_ratings(101, 102, 103, 104, 105, 106, 107)
+    players_list = init_ratings(101, 102, 103, 104, 105, 106, 107, 108)
     for player in players_list.items():
-        player[1]['winPct'] = player[1]['won']/player[1]['played']*100 if player[1]['played'] else 0
+        player[1]['winPct'] = player[1]['won'] / \
+            player[1]['played']*100 if player[1]['played'] else 0
     print(players_list)
     # players_list = models.Player.objects.all().order_by('firstname', 'lastname')
     context = {'players_list': players_list}

@@ -27,7 +27,8 @@ class Player(models.Model):
     lastname = models.CharField(max_length=30)
 
     class Meta:
-        unique_together = ['firstname', 'lastname']
+        ordering = ['firstname', 'lastname', ]
+        unique_together = ['firstname', 'lastname', ]
 
     def __str__(self):
         return self.firstname+' '+self.lastname
