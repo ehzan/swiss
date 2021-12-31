@@ -141,7 +141,6 @@ def preview(request, tournamentId=None, round=None):
 def save_round(request, tournamentId=None, round=None):
     print('==========save_round==========')
     data = request.POST
-    print(data)
     results = json.loads(data['results'])
 
     theTour = models.Tournament.objects.get(id=tournamentId)
@@ -152,12 +151,18 @@ def save_round(request, tournamentId=None, round=None):
             tournament=theTour, player__id=result['playerId1']).player
         plyr2 = models.Participant.objects.get(
             tournament=theTour, player__id=result['playerId2']).player
+
+        if models.Match.objects.filter(tournament=theTour, player1=plyr1, player2=plyr2).exists() or \
+                models.Match.objects.filter(tournament=theTour, player1=plyr2, player2=plyr1).exists():
+            print('Duplicate Match!')
+            return HttpResponse('Duplicate Match!')
+
         models.Match.objects.create(tournament=theTour, round=round,
                                     player1=plyr1, player2=plyr2,
                                     score1=result['score1'], score2=result['score2'])
 
     print(models.Match.objects.all())
-    return HttpResponse('Saved!')
+    return HttpResponse('Data Saved!')
 
 
 def points(won, drawn, lost, sport='Table Tennis'):
@@ -228,14 +233,11 @@ def table(tournamentId, round):
 def round(request, tournamentId, round):
     print('==========round==========')
     theTour = models.Tournament.objects.get(id=tournamentId)
-    print(theTour)
     results = models.Match.objects.filter(tournament=theTour, round=round)
     mytable = table(tournamentId, round-1)
     for match in results:
         mytable[match.player1.id]['selected'] = True
         mytable[match.player2.id]['selected'] = True
-    print(mytable)
-
     context = {'tournament': theTour, 'round': round,
                'results': results, 'table': mytable, }
     return render(request, 'round.html', context)
@@ -266,7 +268,7 @@ def init_ratings(*tournamentIds):
 
 
 def ratings(request, tournamentIds=None):
-    players_list = init_ratings(101, 102, 103, 104, 105, 106, 107, 108)
+    players_list = init_ratings(101, 102, 103, 104, 105, 106, 107, 108, 109)
     for player in players_list.items():
         player[1]['winPct'] = player[1]['won'] / \
             player[1]['played']*100 if player[1]['played'] else 0

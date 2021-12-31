@@ -131,11 +131,13 @@
     }
 
     function ajax_response_handler() {
-        if (this.responseText != "Saved!") {
-            console.log(this.responseText);
-            alert("Somthing went wrong! Data was not saved.");
-            return;
-        }
+        // if (this.responseText != "Saved!") {
+        //     console.log(this.responseText);
+        //     alert("Somthing went wrong! Data was not saved.");
+        //     return;
+        // }
+        console.log(this.responseText);
+        lbSave.innerText = this.responseText;
         everything_is_saved = true;
         pWarning.hidden = true;
         lbSave.style.transition = "";
