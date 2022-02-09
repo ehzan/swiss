@@ -252,8 +252,10 @@ def init_ratings(*tournamentIds):
     players_list[0]['rating'] = 0
     for id in tournamentIds:
         for p in models.Participant.objects.filter(tournament__id=id):
-            p.initial_rating = players_list[p.player.id]['rating'] + 100 \
+            p.initial_rating = players_list[p.player.id]['rating'] + 100 + 50*(id == 111)\
                 if p.player.firstname != 'Bye' else 0
+            # if id == 111 and p.player.lastname in {'رهگذر', 'گودرزی', 'توانایی'}:
+            #     p.initial_rating = 1400
             p.save()
         t1 = table(id, models.Tournament.objects.get(id=id).number_of_rounds+1)
         for row in t1.items():
@@ -268,7 +270,8 @@ def init_ratings(*tournamentIds):
 
 
 def ratings(request, tournamentIds=None):
-    players_list = init_ratings(101, 102, 103, 104, 105, 106, 107, 108, 109)
+    players_list = init_ratings(
+        101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112)
     for player in players_list.items():
         player[1]['winPct'] = player[1]['won'] / \
             player[1]['played']*100 if player[1]['played'] else 0
