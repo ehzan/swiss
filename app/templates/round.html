@@ -35,9 +35,7 @@
     var everything_is_saved = true;
 
     function load() {
-        if (parseInt("{{ round }}") <= 1)
-            btnPrevious.disabled = true;
-        if (parseInt("{{ round }}") >= parseInt("{{ tournament.number_of_rounds }}"))
+        if (parseInt("{{ round }}") > parseInt("{{ tournament.number_of_rounds }}"))
             btnNext.disabled = true;
     }
 
@@ -54,6 +52,8 @@
         if (everything_is_saved || forced)
             if (parseInt("{{ round }}") > 1)
                 window.location.replace("{% url 'round' tournament.id round|add:-1 %}");
+            else if (parseInt("{{ round }}") == 1)
+                window.location.replace("{% url 'tournament' tournament.id %}");
             else;
         else {
             btnConfirmYes.onclick = (e) => previous(true);
@@ -63,7 +63,7 @@
 
     function next(forced = false) {
         if (everything_is_saved || forced)
-            if (parseInt("{{ round }}") < parseInt("{{ tournament.number_of_rounds }}"))
+            if (parseInt("{{ round }}") <= parseInt("{{ tournament.number_of_rounds }}"))
                 window.location.replace("{% url 'round' tournament.id round|add:1 %}");
             else;
         else {

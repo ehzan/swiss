@@ -184,11 +184,13 @@ def rating_change(Sa, Sb, Ra, Rb, K=60):
 
 
 def table(tournamentId, round):
+    print('==========table==========')
+
     participants = models.Participant.objects.filter(
         tournament__id=tournamentId)
     table = {p.player.id: {'playerId': p.player.id, 'playerName': p.player.__str__(),
                            'played': 0, 'points': 0, 'won': 0, 'drawn': 0, 'lost': 0, 'tiebreak': 0,
-                           'rating': p.initial_rating, 'selected': False}
+                           'initial_rating': p.initial_rating, 'rating': p.initial_rating, 'selected': False}
              for p in participants}
 
     for r in range(1, round+1):
@@ -249,13 +251,15 @@ def init_ratings(*tournamentIds):
         tournament__id__in=tournamentIds)
     players_list = dict(
         map(lambda p: (p.player.id, {'name': p.player.__str__(), 'played': 0, 'won': 0, 'lost': 0, 'rating': 900}), all_players))
-    players_list[0]['rating'] = 0
+    # players_list[0]['rating'] = 0
     for id in tournamentIds:
+        print(id)
+        if (not models.Tournament.objects.filter(id=id).exists()):
+            print("{} doesn't exist".format(id))
+            continue
         for p in models.Participant.objects.filter(tournament__id=id):
-            p.initial_rating = players_list[p.player.id]['rating'] + 100 + 50*(id == 111)\
+            p.initial_rating = players_list[p.player.id]['rating'] + 100\
                 if p.player.firstname != 'Bye' else 0
-            # if id == 111 and p.player.lastname in {'رهگذر', 'گودرزی', 'توانایی'}:
-            #     p.initial_rating = 1400
             p.save()
         t1 = table(id, models.Tournament.objects.get(id=id).number_of_rounds+1)
         for row in t1.items():
